@@ -2,9 +2,9 @@
 // Advent of Code 2021, day 7, part one
 //
 
+#include <algorithm>
 #include <cstdlib>
 #include <iostream>
-#include <limits>
 #include <numeric>
 #include <vector>
 
@@ -24,21 +24,13 @@ int main()
 {
 	auto positions = read_positions();
 
-	int best_pos = -1;
-	long best_cost = std::numeric_limits<long>::max();
+	std::ranges::nth_element(positions, positions.begin() + positions.size() / 2);
 
-	for (auto pos : positions) {
-		long cost = std::accumulate(positions.begin(), positions.end(), 0L,
-			[&](long sum, int p) {
-				return sum + std::abs(p - pos);
-			}
-		);
+	auto median = positions[positions.size() / 2];
 
-		if (cost < best_cost) {
-			best_pos = pos;
-			best_cost = cost;
+	std::cout << std::accumulate(positions.begin(), positions.end(), 0L,
+		[&](long sum, int pos) {
+			return sum + std::abs(median - pos);
 		}
-	}
-
-	std::cout << best_cost << '\n';
+	) << '\n';
 }
