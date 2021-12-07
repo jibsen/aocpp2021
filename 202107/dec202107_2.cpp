@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
-#include <limits>
 #include <numeric>
 #include <vector>
 
@@ -21,28 +20,25 @@ auto read_positions()
 	return positions;
 }
 
+long fuel_cost(const std::vector<int> &positions, int final_pos)
+{
+	return std::accumulate(positions.begin(), positions.end(), 0L,
+		[&](long sum, int pos) {
+			long dist = std::abs(final_pos - pos);
+			return sum + (dist * (dist + 1)) / 2;
+		}
+	);
+}
+
 int main()
 {
 	auto positions = read_positions();
 
-	int best_pos = -1;
-	long best_cost = std::numeric_limits<long>::max();
+	long sum = std::accumulate(positions.begin(), positions.end(), 0L);
 
-	auto [min, max] = std::ranges::minmax(positions);
+	long mean = (sum + positions.size() / 2) / positions.size();
 
-	for (int pos = min; pos <= max; ++pos) {
-		long cost = std::accumulate(positions.begin(), positions.end(), 0L,
-			[&](long sum, int p) {
-				long dist = std::abs(p - pos);
-				return sum + (dist * (dist + 1)) / 2;
-			}
-		);
-
-		if (cost < best_cost) {
-			best_pos = pos;
-			best_cost = cost;
-		}
-	}
-
-	std::cout << best_cost << '\n';
+	std::cout << std::min({fuel_cost(positions, mean - 1),
+	                       fuel_cost(positions, mean),
+			       fuel_cost(positions, mean + 1)});
 }
