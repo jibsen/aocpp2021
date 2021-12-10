@@ -69,7 +69,7 @@ int main()
 		}
 	}
 
-	std::ranges::partial_sort(sizes.begin(), sizes.begin() + 3, sizes.end(), std::greater{});
+	std::ranges::nth_element(sizes, sizes.begin() + 2, std::greater{});
 
 	std::cout << std::accumulate(sizes.begin(), sizes.begin() + 3, 1, std::multiplies{}) << '\n';
 }
