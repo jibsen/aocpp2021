@@ -2,8 +2,8 @@
 // Advent of Code 2021, day 12, part two
 //
 
-#include <iostream>
 #include <cctype>
+#include <iostream>
 #include <queue>
 #include <string>
 #include <string_view>
