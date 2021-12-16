@@ -70,7 +70,7 @@ int main()
 		pair_counts.swap(next_pair_counts);
 	}
 
-	auto [min, max] = std::ranges::minmax_element(element_counts | std::views::values);
+	auto [min, max] = std::ranges::minmax(element_counts | std::views::values);
 
-	std::cout << *max - *min << '\n';
+	std::cout << max - min << '\n';
 }
