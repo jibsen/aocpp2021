@@ -1,12 +1,8 @@
 //
-// Advent of Code 2021, day 18, part one
+// Advent of Code 2021, day 18, part two
 //
 
-// I feel like there should be some elegant solution using std::variant
-// here, but since all the numbers are non-negative and the input does not
-// grow exponentially, we opt for the simple representation as a vector of
-// int using negative numbers for opening and closing parenthesis.
-
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -156,20 +152,20 @@ std::size_t magnitude(const Number &num)
 
 int main()
 {
-	Number res;
+	std::vector<Number> numbers;
 
 	for (std::string line; std::getline(std::cin, line); ) {
-		auto num = read_number(line);
+		numbers.push_back(read_number(line));
+	}
 
-		if (res.empty()) {
-			res = num;
-		}
-		else {
-			res = add_numbers(res, num);
+	std::size_t largest_mag = 0;
+
+	for (int i = 0; i < numbers.size(); ++i) {
+		for (int j = i + 1; j < numbers.size(); ++j) {
+			largest_mag = std::max(largest_mag, magnitude(add_numbers(numbers[i], numbers[j])));
+			largest_mag = std::max(largest_mag, magnitude(add_numbers(numbers[j], numbers[i])));
 		}
 	}
 
-	print_number(res);
-
-	std::cout << magnitude(res) << '\n';
+	std::cout << largest_mag << '\n';
 }
