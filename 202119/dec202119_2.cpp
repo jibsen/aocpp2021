@@ -58,16 +58,16 @@ auto read_scanner_reports()
 	return scanners;
 }
 
-constexpr int signed_one(int v)
+constexpr int apply_sign(int v, int sign)
 {
-	return v < 0 ? -1 : 1;
+	return sign < 0 ? -v : v;
 }
 
 Vec3 transform_point(const Vec3 &vec, const Vec3 &perm, const Vec3 &translation)
 {
-	return {vec[std::abs(perm[0]) - 1] * signed_one(perm[0]) + translation[0],
-	        vec[std::abs(perm[1]) - 1] * signed_one(perm[1]) + translation[1],
-	        vec[std::abs(perm[2]) - 1] * signed_one(perm[2]) + translation[2]};
+	return {apply_sign(vec[std::abs(perm[0]) - 1], perm[0]) + translation[0],
+	        apply_sign(vec[std::abs(perm[1]) - 1], perm[1]) + translation[1],
+	        apply_sign(vec[std::abs(perm[2]) - 1], perm[2]) + translation[2]};
 }
 
 std::pair<Vec3, std::size_t> most_common_difference(const std::vector<Vec3> &lhs, const std::vector<Vec3> &rhs)
@@ -132,7 +132,7 @@ Vec3 combine_perms(const Vec3 &first, const Vec3 &second)
 	Vec3 res = {};
 
 	for (int i = 0; i < res.size(); ++i) {
-		res[i] = first[std::abs(second[i]) - 1] * signed_one(second[i]);
+		res[i] = apply_sign(first[std::abs(second[i]) - 1], second[i]);
 	}
 
 	return res;
