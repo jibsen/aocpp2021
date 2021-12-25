@@ -2,6 +2,11 @@
 // Advent of Code 2021, day 23, part one and two
 //
 
+// I initially solved part one with a version that used a different
+// representation and some hardcoded lookup tables. While faster, it
+// proved hard to extend to part two, so I wrote this more general
+// (but messier) version that works for both.
+
 #include <algorithm>
 #include <array>
 #include <format>
