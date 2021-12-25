@@ -9,6 +9,7 @@
 #include <iterator>
 #include <queue>
 #include <string>
+#include <tuple>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -120,7 +121,7 @@ std::pair<bool, std::size_t> search_path(const State &state, int start_x, int st
 				return {true, 1000 * dist};
 			default:
 				std::cerr << "search_path error\n";
-				return {false, 0};
+				return {};
 			}
 		}
 
@@ -139,10 +140,10 @@ std::pair<bool, std::size_t> search_path(const State &state, int start_x, int st
 		}
 	}
 
-	return {false, 0};
+	return {};
 }
 
-std::vector<std::pair<std::size_t, std::pair<int, int>>> moves_from_room(const State &state, int x, int y)
+std::vector<std::pair<std::size_t, std::pair<int, int>>> get_moves_from_room(const State &state, int x, int y)
 {
 	constexpr std::array<std::pair<int, int>, 7> hallway = {{
 		{ 1, 1 }, { 2, 1 }, { 4, 1 }, { 6, 1 }, { 8, 1 }, { 10, 1 }, { 11, 1 }
@@ -155,17 +156,17 @@ std::vector<std::pair<std::size_t, std::pair<int, int>>> moves_from_room(const S
 			continue;
 		}
 
-		auto [possible, dist] = search_path(state, x, y, end_x, end_y);
+		auto [possible, cost] = search_path(state, x, y, end_x, end_y);
 
 		if (possible) {
-			moves.push_back({dist, {end_x, end_y}});
+			moves.push_back({cost, {end_x, end_y}});
 		}
 	}
 
 	return moves;
 }
 
-std::pair<bool, std::pair<int, int>> move_from_hallway(const State &state, int x, int y)
+std::pair<bool, std::tuple<std::size_t, int, int>> get_move_from_hallway(const State &state, int x, int y)
 {
 	constexpr std::array<std::pair<char, int>, 4> rooms = {{
 		{'A', 3}, {'B', 5}, {'C', 7}, {'D', 9}
@@ -178,18 +179,24 @@ std::pair<bool, std::pair<int, int>> move_from_hallway(const State &state, int x
 
 		for (int row = 2; state[row][column] != '#'; ++row) {
 			if (state[row][column] != '.' && state[row][column] != type) {
-				return {false, {0, 0}};
+				return {};
 			}
 		}
 
 		for (int row = 2; ; ++row) {
 			if (state[row][column] != '.') {
-				return {true, {column, row - 1}};
+				auto [possible, cost] = search_path(state, x, y, column, row - 1);
+
+				if (possible) {
+					return {true, {cost, column, row - 1}};
+				}
+
+				return {};
 			}
 		}
 	}
 
-	return {false, {0, 0}};
+	return {};
 }
 
 std::size_t organize_amphipods(State &state, std::size_t energy)
@@ -222,16 +229,12 @@ std::size_t organize_amphipods(State &state, std::size_t energy)
 			}
 
 			if (y == 1) {
-				auto [found, move] = move_from_hallway(state, x, y);
+				auto [found, move] = get_move_from_hallway(state, x, y);
 
 				if (found) {
-					auto [end_x, end_y] = move;
+					auto [cost, end_x, end_y] = move;
 
-					auto [possible, dist] = search_path(state, x, y, end_x, end_y);
-
-					if (possible) {
-						moves.push_back({dist, {x, y, end_x, end_y}});
-					}
+					moves.push_back({cost, {x, y, end_x, end_y}});
 				}
 			}
 			else {
@@ -239,12 +242,12 @@ std::size_t organize_amphipods(State &state, std::size_t energy)
 					continue;
 				}
 
-				auto new_moves = moves_from_room(state, x, y);
+				auto new_moves = get_moves_from_room(state, x, y);
 
-				for (auto [dist, end] : new_moves) {
+				for (auto [cost, end] : new_moves) {
 					auto [end_x, end_y] = end;
 
-					moves.push_back({dist, {x, y, end_x, end_y}});
+					moves.push_back({cost, {x, y, end_x, end_y}});
 				}
 			}
 		}
